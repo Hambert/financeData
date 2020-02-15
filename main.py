@@ -26,6 +26,11 @@ def index():
 
 @app.route('/main')
 def main():
+	return render_template("main.html")
+
+
+@app.route('/vixratio')
+def vixratio():
 	if myKey is not None:
 		VIX_data = getTimeSeriesData("VIX", myKey)
 		VIX_timeSeries = VIX_data["Time Series (Daily)"]
@@ -53,7 +58,7 @@ def main():
 			except KeyError:
 				print('ende')
 
-		return render_template("main.html", data=chartData, date=strTime, vix=lastVIX, vxv=lastVXV)
+		return render_template("vixratio.html", data=chartData, date=strTime, vix=lastVIX, vxv=lastVXV)
 	else:
 		return redirect("/error", code=302)
 
