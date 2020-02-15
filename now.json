@@ -17,6 +17,6 @@
       }
     ],
   "env": {
-    "APIKEY": "@my_APIKEY"
+    "APIKEY": "@my_apikey"
 	}
 }
