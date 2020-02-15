@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block title %}Settings{% endblock %}
+
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #31B404; }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <h1>Settings</h1>
+  <p class="important">
+    Change your settings here.
+{% endblock %}
+{% block footer %}
+      <ul>
+        <li><a href="/main">Home</a></li>
+        <li><b><a href="/settings">Settings</a></b></li>
+        <li><a href="/about">About</a></li>
+      </ul> 
+{% endblock %}
