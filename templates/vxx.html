@@ -8,22 +8,20 @@
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 {% endblock %}
 {% block content %}
-  <h1>VIX und VXV Verhältnis</h1>
-  <p>Der Chart zeigt das Verhältnis des VIX zum VIX3M (VXV). Der VIX (CBOE Volatility Index) zeigt die Schwankungsbreite des S&P 500 Aktienindex.
-  Der VIX3M zeigt wie der VIX die Schwankungsbreite, allerdings über 3 Monate.</p>
+  <h1>Der VXX</h1>
+  <p>Der VXX ist ein Volatility ETF auf den S&P 500. Er enthält Futures auf Vx1 + Vx2 mit einer durchschnittlochen Restlaufzeit von ca. 30 Tagen.
+      Der Preis sinkt bei geringer Volatilität durch die Rollverluste und steigt bei Hoher volatilität</p>
   <p class="important">
     Schlusskurs am: {{ date }} <br>
-    VIX: {{ vix }} <br>
-    VXV: {{ vxv }} <br>
-    Ratio: {{ vixRatio }}
+    VIX: {{ vxx }} <br>
     <div id="chart_div"></div>
 {% endblock %}
 {% block footer %}
       <ul>
         <li><a href="/main">Home</a></li>
           <ul>
-              <li><b><a href="/vixratio">VIX / VXV</a></b></li>
-              <li><a href="/vxx">VXX</a></li>
+              <li><a href="/vixratio">VIX / VXV</a></li>
+              <li><b><a href="/vixratio">VXX</a></b></li>
           </ul>
         <li><a href="/settings">Settings</a></li>
         <li><a href="/about">About</a></li>
@@ -37,9 +35,7 @@ function drawBackgroundColor() {
       var data = new google.visualization.DataTable();
 
       data.addColumn('string', 'Date');
-      data.addColumn('number', 'VIX/VXV');
-      data.addColumn('number', "VIX");
-      data.addColumn('number', "VXV");
+      data.addColumn('number', 'VXX');
       data.addRows([
         {{ data |safe }}
       ]);
@@ -47,16 +43,10 @@ function drawBackgroundColor() {
       var options = {
          series: {
               0: {targetAxisIndex: 0},
-              1: {targetAxisIndex: 1},
-              2: {targetAxisIndex: 1}
         },
         vAxes: {
           // Adds titles to each axis.
-          0: {title: 'VIX/VXV',
-          ticks: [0.6,0.7,0.8,0.9,1.0,1.1,1.2]
-          },
-          1: {title: 'VIX & VXV'}
-          //2: {title: 'VXV'}
+          0: {title: 'VXX'}
         },
         hAxis: {
           title: 'Datum'

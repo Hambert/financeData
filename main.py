@@ -64,6 +64,35 @@ def vixratio():
 		return redirect("/error", code=302)
 
 
+@app.route('/vxx')
+def vxxx():
+	if myKey is not None:
+		VXX_data = getTimeSeriesData("VXX", myKey)
+		VXX_timeSeries = VXX_data["Time Series (Daily)"]
+
+		dataFrom = VXX_data["Meta Data"]["3. Last Refreshed"]
+		struct_time = time.strptime(dataFrom, "%Y-%m-%d")
+		strTime = time.strftime("%d.%m.%Y", struct_time)
+
+		lastVXX = VXX_data["Time Series (Daily)"][dataFrom]['4. close']
+
+		chartData = ''
+		dataList = []
+		for key, value in VXX_timeSeries.items():
+			try:
+				dataList.insert(0, '[\'' + key + '\', ' + value['4. close'] + '],' )
+				print(key + ", vxx: " + value['4. close'])
+			except KeyError:
+				print('ende')
+
+		for elm in dataList:
+			chartData = chartData + elm
+
+		return render_template("vxx.html", data=chartData, date=strTime, vxx=lastVXX)
+	else:
+		return redirect("/error", code=302)
+
+
 @app.route('/about')
 def about():
 	return render_template("about.html")
