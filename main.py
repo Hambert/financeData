@@ -44,6 +44,7 @@ def vixratio():
 
 		lastVIX = VIX_data["Time Series (Daily)"][dataFrom]['4. close']
 		lastVXV = VXV_data["Time Series (Daily)"][dataFrom]['4. close']
+		lastRatio = str(round( float(lastVIX) / float(lastVXV), 3))
 
 		chartData = ''
 
@@ -58,7 +59,7 @@ def vixratio():
 			except KeyError:
 				print('ende')
 
-		return render_template("vixratio.html", data=chartData, date=strTime, vix=lastVIX, vxv=lastVXV)
+		return render_template("vixratio.html", data=chartData, date=strTime, vix=lastVIX, vxv=lastVXV, vixRatio=lastRatio)
 	else:
 		return redirect("/error", code=302)
 
