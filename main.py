@@ -4,9 +4,13 @@ import json
 import urllib.request
 from flask import Flask, render_template, redirect
 import time
+
+import re
+
 import settings
 myKey = settings.APIKEY
-#
+
+
 def getTimeSeriesData(symbol, api):
 	urlData = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol='+symbol+'&outputsize=conpact&datatype=json&apikey=' + api
 	webURL = urllib.request.urlopen(urlData)
@@ -39,6 +43,12 @@ def vixratio():
 		VXV_timeSeries = VXV_data["Time Series (Daily)"]
 
 		dataFrom = VXV_data["Meta Data"]["3. Last Refreshed"]
+
+		# sometimes this contains date and time
+		matchObj = re.match(r'\d{4}-\d{2}-\d{2}', dataFrom)
+		dataFrom = matchObj.group(0)
+
+		# convert date format
 		struct_time = time.strptime(dataFrom, "%Y-%m-%d")
 		strTime = time.strftime("%d.%m.%Y", struct_time)
 
@@ -57,7 +67,7 @@ def vixratio():
 				# print(key + ", VIX: " + str(vix) + " VXV: " + str(vxv) + " res: " + str(result))
 
 			except KeyError:
-				print('ende')
+				print('KeyError')
 
 		return render_template("vixratio.html", data=chartData, date=strTime, vix=lastVIX, vxv=lastVXV, vixRatio=lastRatio)
 	else:
@@ -71,6 +81,11 @@ def vxxx():
 		VXX_timeSeries = VXX_data["Time Series (Daily)"]
 
 		dataFrom = VXX_data["Meta Data"]["3. Last Refreshed"]
+
+		# sometimes this contains date and time
+		matchObj = re.match(r'\d{4}-\d{2}-\d{2}', dataFrom)
+		dataFrom = matchObj.group(0)
+
 		struct_time = time.strptime(dataFrom, "%Y-%m-%d")
 		strTime = time.strftime("%d.%m.%Y", struct_time)
 
@@ -81,9 +96,9 @@ def vxxx():
 		for key, value in VXX_timeSeries.items():
 			try:
 				dataList.insert(0, '[\'' + key + '\', ' + value['4. close'] + '],' )
-				print(key + ", vxx: " + value['4. close'])
+				# print(key + ", vxx: " + value['4. close'])
 			except KeyError:
-				print('ende')
+				print('KeyError')
 
 		for elm in dataList:
 			chartData = chartData + elm
@@ -110,4 +125,4 @@ def errorpage():
 
 if __name__ == '__main__': 
 	# running app 
-	app.run(use_reloader = True, debug = True) 
+	app.run(use_reloader=True, debug=True)
