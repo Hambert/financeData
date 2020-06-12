@@ -12,7 +12,7 @@ myKey = settings.APIKEY
 
 
 def getTimeSeriesData(symbol, api):
-	urlData = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol='+symbol+'&outputsize=conpact&datatype=json&apikey=' + api
+	urlData = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol='+symbol+'&outputsize=conpact&datatype=json&apikey=' + api
 	webURL = urllib.request.urlopen(urlData)
 	data = webURL.read()
 	encoding = webURL.info().get_content_charset('utf-8')
@@ -36,40 +36,54 @@ def main():
 @app.route('/vixratio')
 def vixratio():
 	if myKey is not None:
+
 		VIX_data = getTimeSeriesData("VIX", myKey)
-		VIX_timeSeries = VIX_data["Time Series (Daily)"]
+		try:
+			VIX_timeSeries = VIX_data["Time Series (Daily)"]
+		except KeyError:
+			print('no data')
+			VIX_timeSeries = []
 
 		VXV_data = getTimeSeriesData("VXV", myKey)
-		VXV_timeSeries = VXV_data["Time Series (Daily)"]
+		
+		try:
+			VXV_timeSeries = VXV_data["Time Series (Daily)"]
+		except KeyError:
+			print('no data')
+			VXV_timeSeries = []
 
-		dataFrom = VXV_data["Meta Data"]["3. Last Refreshed"]
+		if VXV_timeSeries == [] or VIX_timeSeries == [] :
+			return render_template("error.html")
 
-		# sometimes this contains date and time
-		matchObj = re.match(r'\d{4}-\d{2}-\d{2}', dataFrom)
-		dataFrom = matchObj.group(0)
+		else:
+			dataFrom = VXV_data["Meta Data"]["3. Last Refreshed"]
 
-		# convert date format
-		struct_time = time.strptime(dataFrom, "%Y-%m-%d")
-		strTime = time.strftime("%d.%m.%Y", struct_time)
+			# sometimes this contains date and time
+			matchObj = re.match(r'\d{4}-\d{2}-\d{2}', dataFrom)
+			dataFrom = matchObj.group(0)
 
-		lastVIX = VIX_data["Time Series (Daily)"][dataFrom]['4. close']
-		lastVXV = VXV_data["Time Series (Daily)"][dataFrom]['4. close']
-		lastRatio = str(round( float(lastVIX) / float(lastVXV), 3))
+			# convert date format
+			struct_time = time.strptime(dataFrom, "%Y-%m-%d")
+			strTime = time.strftime("%d.%m.%Y", struct_time)
 
-		chartData = ''
+			lastVIX = VIX_data["Time Series (Daily)"][dataFrom]['4. close']
+			lastVXV = VXV_data["Time Series (Daily)"][dataFrom]['4. close']
+			lastRatio = str(round( float(lastVIX) / float(lastVXV), 3))
 
-		for key, value in VXV_timeSeries.items():
-			try:
-				vix = float(VIX_timeSeries[key]['4. close'])
-				vxv = float(VXV_timeSeries[key]['4. close'])
-				result = round(vix / vxv, 3)
-				chartData = chartData + '[\'' + key + '\', ' + str(result) + ', ' + str(vix) + ', ' + str(vxv) + '],'
-				# print(key + ", VIX: " + str(vix) + " VXV: " + str(vxv) + " res: " + str(result))
+			chartData = ''
 
-			except KeyError:
-				print('KeyError')
+			for key, value in VXV_timeSeries.items():
+				try:
+					vix = float(VIX_timeSeries[key]['4. close'])
+					vxv = float(VXV_timeSeries[key]['4. close'])
+					result = round(vix / vxv, 3)
+					chartData = chartData + '[\'' + key + '\', ' + str(result) + ', ' + str(vix) + ', ' + str(vxv) + '],'
+					#print(key + ", VIX: " + str(vix) + " VXV: " + str(vxv) + " res: " + str(result))
 
-		return render_template("vixratio.html", data=chartData, date=strTime, vix=lastVIX, vxv=lastVXV, vixRatio=lastRatio)
+				except KeyError:
+					print('KeyError')
+
+			return render_template("vixratio.html", data=chartData, date=strTime, vix=lastVIX, vxv=lastVXV, vixRatio=lastRatio)
 	else:
 		return redirect("/error", code=302)
 
