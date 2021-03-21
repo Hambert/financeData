@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+{% block title %}Index{% endblock %}
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #336699; }
+  </style>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{% endblock %}
+{% block content %}
+  <h1>Der VXX</h1>
+  <p>Der VXX ist ein Volatility ETT auf den S&P 500. Er enthält Futures auf Vx1 + Vx2 mit einer durchschnittlochen Restlaufzeit von ca. 30 Tagen.
+      Der Preis sinkt bei geringer Volatilität durch die Rollverluste und steigt bei hoher volatilität</p>
+  <p class="important">
+    Schlusskurs am: {{ date }} <br>
+    VIX: {{ vxx }} <br>
+    <div id="chart_div"></div>
+{% endblock %}
+{% block footer %}
+      <ul>
+        <li><a href="/main">Home</a></li>
+          <ul>
+              <li><a href="/vixratio">VIX / VXV</a></li>
+              <li><b><a href="/vixratio">VXX</a></b></li>
+          </ul>
+        <li><a href="/settings">Settings</a></li>
+        <li><a href="/about">About</a></li>
+      </ul> 
+      <script>
+
+    google.charts.load('current', {packages: ['corechart', 'line']});
+    google.charts.setOnLoadCallback(drawBackgroundColor);
+
+function drawBackgroundColor() {
+      var data = new google.visualization.DataTable();
+
+      data.addColumn('string', 'Date');
+      data.addColumn('number', 'VXX');
+      data.addRows([
+        {{ data |safe }}
+      ]);
+
+      var options = {
+         series: {
+              0: {targetAxisIndex: 0},
+        },
+        vAxes: {
+          // Adds titles to each axis.
+          0: {title: 'VXX'}
+        },
+        hAxis: {
+          title: 'Datum'
+
+        },
+        height : 500,
+        backgroundColor: '#f1f8e9'
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
+    }
+
+      </script>
+{% endblock %}

@@ -2,7 +2,7 @@
 # importing modules 
 import json
 import urllib.request
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, request
 import time
 
 import re
@@ -118,6 +118,31 @@ def vxxx():
 			chartData = chartData + elm
 
 		return render_template("vxx.html", data=chartData, date=strTime, vxx=lastVXX)
+	else:
+		return redirect("/error", code=302)
+
+
+@app.route('/stocks')
+def simpelStock():
+	if myKey is not None:
+		symbol = request.args.get('symbol')
+
+		stockData = getTimeSeriesData(symbol, myKey)
+		timeSeries = stockData["Time Series (Daily)"]
+
+		chartData = ''
+		dataList = []
+		for key, value in timeSeries.items():
+			try:
+				dataList.insert(0, '[\'' + key + '\', ' + value['4. close'] + '],' )
+				# print(key + ", vxx: " + value['4. close'])
+			except KeyError:
+				print('KeyError')
+
+		for elm in dataList:
+			chartData = chartData + elm
+
+		return render_template("stocks.html", data=chartData, symbol=symbol)
 	else:
 		return redirect("/error", code=302)
 
